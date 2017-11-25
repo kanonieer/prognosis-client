@@ -1,0 +1,145 @@
+/* You can add global styles to this file, and also import other style files */
+@primary: #fff;
+@secondary: #394b58;
+@accent: #0087d7;
+@font: 'Roboto', sans-serif;
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-start;
+
+    &-counters {
+        // height: 100%;
+        // padding: 50px 100px;
+        // display: flex;
+        // flex-direction: column;
+        // justify-content: flex-start;
+        // font-family: @font;
+        // color: @secondary;
+
+        // * {
+        //     padding: 20px 0;
+        // }
+
+        // p {
+        //     font-size: 20px;
+
+        //     &:not(:first-of-type) {
+        //         border-top: 1px solid @secondary;
+        //         font-size: 16px;
+        //         padding: 5px;
+        //         display: flex;
+        //         flex-direction: row;
+        //         justify-content: space-between;
+        //         align-items: center;
+        //         width: 600px;
+        //     }
+        // }
+    }
+}
+
+.navbar {
+    height: 100%;
+    background: @secondary;
+    color: @primary;
+
+    &__menu {
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        list-style: none;
+
+        &-item {
+            padding: 10px;
+
+            &-link {
+                color: @primary;
+                text-decoration: none;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+                align-items: center;
+                cursor: pointer;
+    
+                p {
+                    font-family: @font;
+                    font-size: 20px;
+                }
+
+                i {
+                    font-size: 30px;
+                    margin: 10px;
+                }
+            }
+        }
+    }
+}
+
+.content {
+    height: 100%;
+    padding: 50px 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    font-family: @font;
+    color: @secondary;
+
+    * {
+        padding: 20px 0;
+    }
+
+    p {
+        font-size: 20px;
+
+        &:not(:first-of-type) {
+            border-top: 1px solid @secondary;
+            font-size: 16px;
+            padding: 5px;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            width: 600px;
+        }
+    }
+}
+
+.title {
+    font-size: 50px;
+}
+
+.table {
+    border-collapse: collapse;
+
+    td, th {
+        border: 1px solid rgb(211, 215, 230);
+        padding: 20px;
+    }
+}
+
+.btn {
+    background: @secondary;
+    color: @primary;
+    text-transform: uppercase;
+    border: 0;
+    transition: all .3s ease;
+
+    &:hover {
+        -webkit-box-shadow: 0px 10px 17px -7px rgba(0,0,0,0.75);
+        -moz-box-shadow: 0px 10px 17px -7px rgba(0,0,0,0.75);
+        box-shadow: 0px 10px 17px -7px rgba(0,0,0,0.75);
+        transition: all .3s ease;
+    }
+}

@@ -1,0 +1,13 @@
+<section class="content">
+    <h1 class="title">Grupy taryfowe</h1>
+    <table class="table">
+      <tr>
+        <th>Nazwa grupy</th>
+        <th>Obliczanie kosztow</th>
+      </tr>
+      <tr *ngFor="let tariffGroup of tariffGroups">
+        <td>{{ tariffGroup?.name }}</td>
+        <td>{{ tariffGroup?.calc }}</td>
+      </tr>
+    </table>
+</section>

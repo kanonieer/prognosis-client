@@ -1,0 +1,10 @@
+<section class="content">
+    <h1 class="title">Liczniki</h1>
+    <button class="btn">Dodaj licznik</button>
+    <p>Lista licznikow:</p>
+    <p *ngFor="let counter of counters">
+        {{ counter?.name }}
+        <i class="fa fa-minus-square-o" aria-hidden="true"></i>
+    </p>
+</section>
+
