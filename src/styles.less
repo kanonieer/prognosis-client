@@ -1,7 +1,8 @@
 /* You can add global styles to this file, and also import other style files */
 @primary: #fff;
 @secondary: #394b58;
-@accent: #0087d7;
+@accent: rgb(211, 215, 230);
+
 @font: 'Roboto', sans-serif;
 
 * {
@@ -88,13 +89,18 @@
 }
 
 .content {
-    height: 100%;
     padding: 50px 100px;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     font-family: @font;
     color: @secondary;
+
+    &-container {
+        height: 100%;
+        overflow: scroll;
+        flex: 1;
+    }
 
     * {
         padding: 20px 0;
@@ -111,7 +117,7 @@
             flex-direction: row;
             justify-content: space-between;
             align-items: center;
-            width: 600px;
+            width: 100%;
         }
     }
 }
@@ -129,12 +135,33 @@
     }
 }
 
+.form {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    width: 500px;
+
+    &-input {
+        border: 0;
+        background: @accent;
+        padding: 10px;
+        width: 100%;
+    }
+
+    &-btn {
+        margin-top: 20px;
+        width: 100%;
+    }
+}
+
 .btn {
     background: @secondary;
     color: @primary;
     text-transform: uppercase;
     border: 0;
     transition: all .3s ease;
+    max-width: 500px;
 
     &:hover {
         -webkit-box-shadow: 0px 10px 17px -7px rgba(0,0,0,0.75);

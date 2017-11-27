@@ -1,5 +1,5 @@
 export class TariffGroup {
     id: Number;
-    name: String;
+    title: String;
     calc: String;
 }

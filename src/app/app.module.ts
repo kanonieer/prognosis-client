@@ -8,6 +8,14 @@ import { TariffGroupsComponent } from './tariff-groups/tariff-groups.component';
 import { CostsComponent } from './costs/costs.component';
 import { HomeComponent } from './home/home.component';
 import { routing } from './app.routing';
+import { ConsumptionComponent } from './consumption/consumption.component';
+import { FormsModule } from '@angular/forms';
+import { MonthService } from './services/month.service';
+import { HttpModule } from '@angular/http';
+import { MonthResolver } from './reslovers/month.resolve';
+import { TariffGroupService } from './services/tariff-group.service';
+import { GroupCostPerMonthService } from './services/group-cost-per-month.service';
+import { CounterService } from './services/counter.service';
 
 const appRoutes: Routes = [
   { path: 'home', component: HomeComponent },
@@ -23,13 +31,22 @@ const appRoutes: Routes = [
     CountersComponent,
     TariffGroupsComponent,
     CostsComponent,
-    HomeComponent
+    HomeComponent,
+    ConsumptionComponent
   ],
   imports: [
     BrowserModule,
+    FormsModule,
+    HttpModule,
     routing
   ],
-  providers: [],
+  providers: [
+    MonthService,
+    MonthResolver,
+    TariffGroupService,
+    GroupCostPerMonthService,
+    CounterService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

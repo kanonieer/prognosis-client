@@ -1,3 +1,30 @@
-<p>
-  costs works!
-</p>
+<section class="content">
+  <h1 class="title">Koszt</h1>
+  <p>Tu możesz obliczyc koszt.</p>
+  <form class="form" #costForm="ngForm" (ngSubmit)="getCost(costForm)">
+      <label for="month"> Miesiąc: </label>
+      <select class="form-input" id="month" name="month" ngModel>
+        <option value="default">Wszystkie</option>
+        <option value="lis">Listopad</option>
+        <option value="paź">październik</option>
+        <option value="gru">grudzień</option>
+      </select>
+      <label for="tariffGroup">Grupa taryfowa: </label>
+      <select class="form-input" id="tariffGroup" name="tariffGroup" ngModel>
+        <option value="default">Wszystkie</option>
+        <option value="A">A</option>
+        <option value="B">B</option>
+        <option value="C">C</option>
+      </select>
+      <label for="counter">Licznik: </label>
+      <select class="form-input" id="counter" name="counter" ngModel>
+        <option value="default">Wszystkie</option>
+        <option value="A">A</option>
+        <option value="B">B</option>
+        <option value="C">C</option>
+      </select>
+      <button type="submit" class="btn form-btn">
+        Policz koszt
+      </button>
+    </form>
+</section>

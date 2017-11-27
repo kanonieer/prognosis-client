@@ -1,0 +1,23 @@
+<section class="content">
+  <h1 class="title">Zużycie</h1>
+  <p>Tu możesz wprowadzic zużycie.</p>
+  <form class="form" #consumptionForm="ngForm" (ngSubmit)="addConsumption(consumptionForm)">
+      <label for="counter">Licznik: </label>
+      <select class="form-input" id="counter" name="counter" ngModel>
+        <option *ngFor="let counter of counters" [value]="counter.id">{{ counter?.title }}</option>
+      </select>
+      <label for="month"> Miesiąc: </label>
+      <select class="form-input" id="month" name="month" ngModel>
+        <option *ngFor="let month of months" [value]="month.id">{{ month?.month }}</option>
+      </select>
+      <label for="tariffGroup">Grupa taryfowa: </label>
+      <select class="form-input" id="tariffGroup" name="tariffGroup" ngModel>
+        <option *ngFor="let tariffGroup of tariffGroups" [value]="tariffGroup.id">{{ tariffGroup?.title }}</option>
+      </select>
+      <label for="consumption">Zużycie</label> 
+      <input class="form-input" id="consumption" type="number" name="consumption" ngModel>   
+      <button type="submit" class="btn form-btn">
+        Zapisz zużycie
+      </button>
+    </form>
+</section>
