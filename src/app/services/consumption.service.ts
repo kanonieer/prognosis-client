@@ -8,7 +8,7 @@ import { api } from './../shared/apiAdress';
 import { handleError } from './../shared/handleError';
 
 @Injectable()
-export class GroupCostPerMonthService {
+export class ConsumptionService {
 
   constructor(
     private http: Http
@@ -17,14 +17,14 @@ export class GroupCostPerMonthService {
   private headers = new Headers({'Content-Type': 'application/json'});
   private options = new RequestOptions({headers: this.headers});
 
-  public getGroupCostPerMonths(): Observable<any> {
-    return this.http.get(api + 'groupCostPerMonths/', this.options)
+  public getConsumptions(): Observable<any> {
+    return this.http.get(api + 'consumptions/', this.options)
     .map((response: Response) => response.json())
     .catch(handleError);
   }
 
-  public createGroupCostPerMonth(payload): Observable<any> {
-    return this.http.post(api + 'groupCostPerMonths/', JSON.stringify(payload), this.options)
+  public createConsumption(payload): Observable<any> {
+    return this.http.post(api + 'consumptions/', JSON.stringify(payload), this.options)
     .map((response: Response) => response.json())
     .catch(handleError);
   }

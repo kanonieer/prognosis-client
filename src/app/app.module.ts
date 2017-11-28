@@ -16,6 +16,7 @@ import { MonthResolver } from './reslovers/month.resolve';
 import { TariffGroupService } from './services/tariff-group.service';
 import { GroupCostPerMonthService } from './services/group-cost-per-month.service';
 import { CounterService } from './services/counter.service';
+import { ConsumptionService } from './services/consumption.service';
 
 const appRoutes: Routes = [
   { path: 'home', component: HomeComponent },
@@ -45,7 +46,8 @@ const appRoutes: Routes = [
     MonthResolver,
     TariffGroupService,
     GroupCostPerMonthService,
-    CounterService
+    CounterService,
+    ConsumptionService
   ],
   bootstrap: [AppComponent]
 })
