@@ -1,12 +1,12 @@
 <section class="content">
   <h1 class="title">Koszt</h1>
-  <p>Tu możesz obliczyc koszt.</p>
+  <p>Tu możesz obliczyć koszt.</p>
 
   <div class="tab">
     <div class="tab-item tab-item-selected"
     [ngClass]="{'tab-item-selected': this.showTab }"
     (click)="toggleTab()">
-      Koszt wg. licznikach
+      Koszt wg. liczników
     </div>
     <div class="tab-item" 
     [ngClass]="{'tab-item-selected': !this.showTab }"
@@ -30,7 +30,7 @@
           <label [attr.for]="counter.id">{{ counter?.title }}</label>
         </div>
       </fieldset>
-      <button type="submit" class="btn form-btn">
+      <button type="submit" [disabled]="!isMonthSelected(costForm.value.month)" class="btn form-btn">
         Policz koszt
       </button>
     </form>
@@ -51,9 +51,48 @@
           <label [attr.for]="tariffGroup.id">{{ tariffGroup?.title }}</label>
         </div>
       </fieldset>
-      <button type="submit" class="btn form-btn">
+      <button type="submit" [disabled]="!isMonthSelected(costForm.value.month)" class="btn form-btn">
         Policz koszt
       </button>
     </form>
   </div>
 </section>
+
+<app-modal [show]="this.showCostModal" (hide)="this.toggleCostModal()">
+  <h2 *ngIf="this.showTab" header>Koszt wg. liczników</h2>
+  <div class="modal-content" *ngIf="this.showTab" content>
+    <p class="cost-list-item" *ngFor="let item of costSummary?.valid">
+      {{ item?.counterTitle }}
+      <span>{{ item?.counterCost | number: '1.2-2' }}</span>
+    </p>
+    <p class="cost-list-item cost-summary">
+      Koszt całkowity:
+      <span>{{ costSummary?.totalCost | number: '1.2-2' }}</span>
+    </p>
+    <div *ngIf="!!costSummary.errors.length" class="cost-invalid">
+      Poniższe liczniki nie zostały uwzględnione w rachunku ponieważ 
+      nie przypisano im grupy taryfowej w wybranym miesiącu
+      <p *ngFor="let item of costSummary?.errors">
+        {{ item }}
+      </p>
+    </div>
+  </div>
+
+  <h2 *ngIf="!this.showTab" header>Koszt wg. grup taryfowych</h2>
+  <div class="modal-content" *ngIf="!this.showTab" content>
+    <p class="cost-list-item" *ngFor="let item of costSummary?.valid">
+      {{ item?.tariffGroupTitle }}
+      <span>{{ item?.tariffGroupCost | number: '1.2-2' }}</span>
+    </p>
+    <p class="cost-list-item cost-summary">
+      Koszt całkowity:
+      <span>{{ costSummary?.totalCost | number: '1.2-2' }}</span>
+    </p>
+    <div *ngIf="!!costSummary.errors.length" class="cost-invalid">
+      Poniższe grupy taryfowe mają niepoprawny schemat liczenia kosztu:
+      <p *ngFor="let item of costSummary?.errors">
+        {{ item }}
+      </p>
+    </div>
+  </div>
+</app-modal>

@@ -63,13 +63,11 @@ export class ConsumptionComponent implements OnInit {
     const value = form.value.value;
     const cost = form.value.cost;
 
-    console.log(form.value);
     if (cost) {
       const payloadForCost = { tariffGroupId, cost, monthId };
 
       this.groupCostPerMonthService.createGroupCostPerMonth(payloadForCost)
       .subscribe(newGroupCostPerMonth => {
-        console.log(newGroupCostPerMonth);
         const groupCostPerMonthId = newGroupCostPerMonth.id;
 
         this.registerConsumption(groupCostPerMonthId, counterId, value);
@@ -85,7 +83,6 @@ export class ConsumptionComponent implements OnInit {
 
   public hasGroupAssignedCost(monthId, tariffGroupId): Boolean {
     if (this.valuesAreSelected(monthId, tariffGroupId)) {
-      console.log(`Month ${monthId}, tariffGroup ${tariffGroupId}`);
       return !!this.groupCostPerMonths.find(item =>
         item.monthId.toString() === monthId && item.tariffGroupId.toString() === tariffGroupId);
     }
@@ -109,7 +106,7 @@ export class ConsumptionComponent implements OnInit {
 
   private getGroupCostPerMonthId(monthId, tariffGroupId) {
     return this.groupCostPerMonths.find(item =>
-      item.monthId === monthId && item.tariffGroupId === tariffGroupId);
+      item.monthId === monthId && item.tariffGroupId === tariffGroupId).id;
 
   }
 
@@ -117,7 +114,11 @@ export class ConsumptionComponent implements OnInit {
     const payloadForConsumption = { groupCostPerMonthId, counterId, value };
 
     this.consumptionService.createConsumption(payloadForConsumption)
-    .subscribe(data => console.log(data));
+    .subscribe(data => {
+      alert('Zużycie wprowadzone poprawnie');
+    }, error => {
+      alert('Wystąpił błąd podczas wprowadzania zużycia');
+    });
 
     this.fetchData();
   }

@@ -2,10 +2,11 @@
 @primary: #fff;
 @secondary: #394b58;
 @accent: rgb(211, 215, 230);
-@disabled: #f7f7f7;
-@disabled-label: rgb(233, 235, 240);
 
 @font: 'Roboto', sans-serif;
+
+@tablet: 890px;
+@mobile: 600px;
 
 * {
     box-sizing: border-box;
@@ -50,6 +51,7 @@
                 p {
                     font-family: @font;
                     font-size: 20px;
+                    text-align: center;
                 }
 
                 i {
@@ -132,6 +134,7 @@
             width: 100%;
         }
     }
+
     &-invalid {
         color: red;
         padding: 0;
@@ -145,6 +148,30 @@
     &-btn {
         margin-top: 20px;
         width: 100%;
+    }
+}
+
+.cost {
+    &-list-item {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        width: 100%;
+        min-width: 500px;
+        padding: 10px;
+        font-family: @font;
+        color: @secondary;
+        font-size: 16px;
+    }
+
+    &-summary {
+        border-top: 2px solid @accent;
+        font-size: 20px;
+    }
+
+    &-invalid {
+        color: red;
+        max-width: 500px;
     }
 }
 
@@ -177,7 +204,6 @@
         color: @secondary;
         padding: 20px;
         margin-right: 10px;
-        //border: 2px solid @secondary;
 
         &-selected {
             background: @secondary;
@@ -192,7 +218,7 @@
 }
 
 .modal {
-    &-container {
+    &-background {
         position: fixed;
         display: flex;
         flex-direction: column;
@@ -210,7 +236,7 @@
         overflow: hidden;
     }
 
-    &-content {
+    &-container {
         width: 600px;
         background: @primary;
         padding: 30px;
@@ -233,11 +259,68 @@
     }
 }
 
-.disabled {
-    color: @disabled;
-    background: @disabled;
+@media screen and (max-width: @tablet) {
+    .container {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        flex-direction:column;
+        justify-content: flex-start;
+        align-items: flex-start;
+    } 
 
-    &-label {
-        color: @disabled-label;
+    .navbar {
+        height: auto;
+        width: 100%;
+    
+        &__menu {
+            flex-direction: row;
+            justify-content: space-around;
+        }
+    }
+
+    .content {
+        width: 100%;
+        align-items: center;
+
+        &-container {
+            width: 100%;
+            height: auto;
+            overflow: initial;
+        }
+    }
+}
+
+@media screen and (max-width: @mobile) {
+    .content {
+        padding: 20px
+    }
+    .form {
+        width: 100%;
+    }
+
+    .cost {
+        &-list-item {
+            min-width: auto;
+        }
+    }
+    .modal {
+        &-container {
+            width: 100%;
+
+            h2 {
+                font-size: 28px;
+                text-align: center;
+            }
+        }
+
+        &-content {
+            width: 100%;
+        }
+    }
+
+    .tab-content {
+        max-width: none;
+        width: 100%;
     }
 }

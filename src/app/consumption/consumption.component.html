@@ -1,6 +1,6 @@
 <section class="content">
   <h1 class="title">Zużycie</h1>
-  <p>Tu możesz wprowadzic zużycie.</p>
+  <p>Tu możesz wprowadzić zużycie.</p>
   <form class="form" #consForm="ngForm" (ngSubmit)="addConsumption(consForm)">
 
       <label for="counter">Licznik: </label>
@@ -46,13 +46,14 @@
         </label> 
         <input [disabled]="hasGroupAssignedCost(consForm.value.month, consForm.value.tariffGroup) 
         || hasAssignedGroupInMonth(consForm.value.month, consForm.value.counter)"
-        class="form-input" id="cost" type="number" name="cost"
-        [(ngModel)]="cost" required>
+        class="form-input" id="cost" type="number" name="cost" [(ngModel)]="cost"
+        [required]="hasGroupAssignedCost(consForm.value.month, consForm.value.tariffGroup) 
+        || hasAssignedGroupInMonth(consForm.value.month, consForm.value.counter)">
         <div *ngIf="!consForm.form.controls.cost?.valid 
         && (consForm.form.controls.cost?.dirty
         || consForm.form.controls.cost?.touched)"
         class="form-invalid">
-          <div *ngIf="consForm.form.controls.cost?.errors.required">
+          <div *ngIf="consForm.form.controls.cost?.errors?.required">
             Podanie ceny jest wymagane!
           </div>
         </div>

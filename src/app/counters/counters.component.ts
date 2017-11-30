@@ -40,8 +40,8 @@ export class CountersComponent implements OnInit {
   ];
 
   constructor(private counterService: CounterService) {
-    this.counterService.counters$.subscribe(counters =>
-    this.counters = counters);
+    this.counterService.getCounters()
+    .subscribe(counters => this.counters = counters);
   }
 
   public createCounter(form: NgForm): void {

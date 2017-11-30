@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import * as _ from 'lodash';
 
 import { MonthService } from '../services/month.service';
 import { Month } from '../models/month';
@@ -30,6 +29,12 @@ export class CostsComponent implements OnInit {
   public consumptions: Consumption[] = [];
   public consumptionCosts: ConsumptionCost[] = [];
   public showTab: Boolean = true;
+  public showCostModal: Boolean = false;
+  public costSummary: any = {
+    valid: [],
+    errors: [],
+    totalCost: 0
+  };
 
   constructor(
     private monthService: MonthService,
@@ -68,14 +73,17 @@ export class CostsComponent implements OnInit {
   public getCostForCounters(form: NgForm) {
     const monthId = Number(form.value.month);
     const countersIds = form.value.counters;
-    let fullCost = 0;
+    let totalCost = 0;
     const errors: String[] = [];
+    const valid: any[] = [];
+
 
     Object.entries(countersIds).forEach((counter) => {
       const [key, value] = counter;
 
       if (value) {
         const counterId = Number(key);
+        const counterTitle = this.findById(this.counters, counterId).title;
 
         const consumptionCost =
         this.findByCounterAndMonth(this.consumptionCosts, counterId, monthId);
@@ -85,29 +93,36 @@ export class CostsComponent implements OnInit {
           this.getGroupEvaluationSchema(this.tariffGroups, consumptionCost.tariffGroupId);
 
           if (this.isSchemaSafe(costEvaluationSchema)) {
-            fullCost += this.evaluateCost(costEvaluationSchema, consumptionCost.cost, consumptionCost.value);
+            const counterCost = this.evaluateCost(costEvaluationSchema, consumptionCost.cost, consumptionCost.value);
+            valid.push({counterTitle, counterCost});
+            totalCost += counterCost;
           }
         } else {
-            errors.push(this.findCounterById(counterId).title);
+            errors.push(counterTitle);
         }
 
       }
   });
-    console.log(`Koszt ${fullCost}`);
-    console.log(errors);
+
+    this.costSummary = {valid, errors, totalCost};
+    this.toggleCostModal();
   }
 
   public getCostForTariffGroups(form: NgForm) {
     const monthId = Number(form.value.month);
     const tariffGroupIds = form.value.tariffGroups;
-    console.log(tariffGroupIds);
-    let fullCost = 0;
+
+    let totalCost = 0;
+    const errors: String[] = [];
+    const valid: any[] = [];
+
 
     Object.entries(tariffGroupIds).forEach((tariffGroup) => {
       const [key, value] = tariffGroup;
 
       if (value) {
         const tariffGroupId = Number(key);
+        const tariffGroupTitle = this.findById(this.tariffGroups, tariffGroupId).title;
 
         const consumptionCostFiltered
         = this.findAllByTariffGroupAndMonth(this.consumptionCosts, tariffGroupId, monthId);
@@ -116,14 +131,20 @@ export class CostsComponent implements OnInit {
         this.getGroupEvaluationSchema(this.tariffGroups, tariffGroupId);
 
         if (this.isSchemaSafe(evaluationSchema)) {
+          let tariffGroupCost = 0;
           consumptionCostFiltered.forEach(item => {
-            fullCost += this.evaluateCost(evaluationSchema, item.cost, item.value);
+            tariffGroupCost += this.evaluateCost(evaluationSchema, item.cost, item.value);
           });
+          valid.push({tariffGroupTitle, tariffGroupCost});
+          totalCost += tariffGroupCost;
+        } else {
+          errors.push(tariffGroupTitle);
         }
       }
-      console.log(`Koszt częsciowy: ${fullCost}`);
     });
-    console.log(`Koszt całkowity: ${fullCost}`);
+
+    this.costSummary = {valid, errors, totalCost};
+    this.toggleCostModal();
   }
 
   private getGroupEvaluationSchema(
@@ -133,8 +154,8 @@ export class CostsComponent implements OnInit {
     return array.find(item => item.id === tariffGroupId).calc;
   }
 
-  private findCounterById(id: Number) {
-    return this.counters.find(item => item.id === id);
+  private findById(array: Array<any>, id: Number) {
+    return array.find(item => item.id === id);
   }
 
   private findByCounterAndMonth(
@@ -164,10 +185,23 @@ export class CostsComponent implements OnInit {
   }
 
   private isSchemaSafe(evaluationSchema): Boolean {
-    return true;
+    const pattern = RegExp('(^)([ \+\-\/\*\.0-9\(\)]|CENA|ZUZYCIE)+($)');
+
+    return pattern.test(evaluationSchema);
+  }
+
+  public isMonthSelected(monthId): Boolean {
+    return monthId !== '' && monthId !== undefined && monthId !== null;
   }
 
   public toggleTab() {
     this.showTab = !this.showTab;
+  }
+
+  public toggleCostModal() {
+    this.showCostModal = !this.showCostModal;
+    if (!this.showCostModal) {
+      this.fetchData();
+    }
   }
 }

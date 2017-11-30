@@ -36,7 +36,7 @@ export class TariffGroupsComponent implements OnInit {
     //   calc: '0.8*ZUZYCIE+( ZUZYCIE / 4) * CENA'
     // }
   ];
-  
+
   constructor(private tariffGroupService: TariffGroupService) {
     this.tariffGroupService.getTariffGroups()
     .subscribe(data => this.tariffGroups = data);
