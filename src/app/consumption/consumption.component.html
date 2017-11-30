@@ -2,28 +2,78 @@
   <h1 class="title">Zużycie</h1>
   <p>Tu możesz wprowadzic zużycie.</p>
   <form class="form" #consForm="ngForm" (ngSubmit)="addConsumption(consForm)">
+
       <label for="counter">Licznik: </label>
       <select class="form-input" id="counter" name="counter" ngModel>
-        <option *ngFor="let counter of counters" [value]="counter.id">{{ counter?.title }}</option>
+        <option *ngFor="let counter of counters" [value]="counter.id">
+          {{ counter?.title }}
+        </option>
       </select>
       <label for="month"> Miesiąc: </label>
       <select class="form-input" id="month" name="month" ngModel>
-        <option *ngFor="let month of months" [value]="month.id">{{ month?.month }}</option>
+        <option *ngFor="let month of months" [value]="month.id">
+          {{ month?.month }}
+        </option>
       </select>
-      <label for="tariffGroup">Grupa taryfowa: </label>
-      <select class="form-input" id="tariffGroup" name="tariffGroup" ngModel>
-        <option *ngFor="let tariffGroup of tariffGroups" [value]="tariffGroup.id">{{ tariffGroup?.title }}</option>
-      </select>
-      <div *ngIf="hasGroupCostPerMonth(consForm.value.month, consForm.value.tariffGroup)">
-        <label for="cost">Cena
-          <span class="form-comment">(ta grupa nie ma jeszcze przypisanej ceny w wybranym miesiącu)</span>
-        </label> 
-        <input class="form-input" id="cost" type="number" name="cost" ngModel>
-        <span class="form-comment">Grupie zostanie przypisana cena w danym miesiącu</span>
+
+      <div [hidden]="!valuesAreSelected(consForm.value.month, consForm.value.counter)
+      || !hasAssignedGroupInMonth(consForm.value.month, consForm.value.counter)">
+        Dla wybranego licznika wprowadzono już zużycie w wybranym miesiącu.
       </div>
-      <label for="consumptionValue">Zużycie</label> 
-      <input class="form-input" id="consumptionValue" type="number" name="consumptionValue" ngModel>   
-      <button type="submit" class="btn form-btn">
+
+      <div [hidden]="hasAssignedGroupInMonth(consForm.value.month, consForm.value.counter)"
+      class="form-input-container">
+        <label>
+          Grupa taryfowa
+          <span class="form-comment">
+              (Wybrany licznik nie ma przypisanej grupy w wybranym miesiącu)
+          </span>:
+        </label>
+        <select class="form-input" id="tariffGroup" name="tariffGroup" ngModel>
+          <option *ngFor="let tariffGroup of tariffGroups" [value]="tariffGroup.id">
+            {{ tariffGroup?.title }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-input-container"
+      [hidden]="hasGroupAssignedCost(consForm.value.month, consForm.value.tariffGroup) 
+      || hasAssignedGroupInMonth(consForm.value.month, consForm.value.counter)">
+        <label for="cost">Cena
+          <span class="form-comment">
+            (Wybrana grupa nie ma przypisanej ceny w wybranym miesiącu)
+          </span>:
+        </label> 
+        <input [disabled]="hasGroupAssignedCost(consForm.value.month, consForm.value.tariffGroup) 
+        || hasAssignedGroupInMonth(consForm.value.month, consForm.value.counter)"
+        class="form-input" id="cost" type="number" name="cost"
+        [(ngModel)]="cost" required>
+        <div *ngIf="!consForm.form.controls.cost?.valid 
+        && (consForm.form.controls.cost?.dirty
+        || consForm.form.controls.cost?.touched)"
+        class="form-invalid">
+          <div *ngIf="consForm.form.controls.cost?.errors.required">
+            Podanie ceny jest wymagane!
+          </div>
+        </div>
+      </div>
+
+      <div [hidden]="hasAssignedGroupInMonth(consForm.value.month, consForm.value.counter)"
+      class="form-input-container">
+        <label for="value">Zużycie</label> 
+        <input class="form-input" id="cvalue" type="number" name="value"
+        [(ngModel)]="value" required>
+        <div *ngIf="!consForm.form.controls.value?.valid 
+        && (consForm.form.controls.value?.dirty
+        || consForm.form.controls.value?.touched)"
+        class="form-invalid">
+          <div *ngIf="consForm.form.controls.value?.errors.required">
+            Podanie zużycia jest wymagane!
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" [disabled]="!consForm.valid" class="btn form-btn">
         Zapisz zużycie
       </button>
     </form>

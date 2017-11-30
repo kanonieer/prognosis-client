@@ -11,6 +11,7 @@ import { CounterService } from '../services/counter.service';
 })
 export class CountersComponent implements OnInit {
 
+  public showCreateCounterModal: Boolean = false;
   public counters: Counter[] = [
     // {
     //   id: 1,
@@ -39,27 +40,34 @@ export class CountersComponent implements OnInit {
   ];
 
   constructor(private counterService: CounterService) {
-    this.counterService.getCounters()
-    .subscribe(data => this.counters = data);
+    this.counterService.counters$.subscribe(counters =>
+    this.counters = counters);
   }
 
-  createCounter(): void {
-    this.counterService.createCounter('test')
+  public createCounter(form: NgForm): void {
+    this.counterService.createCounter(form.value.counter)
     .subscribe(data => {
-      console.log(data);
       this.counters.push(data);
+      this.toggleCreateCounterModal();
+      form.reset()
     });
-    console.log(this.counters);
   }
 
-  deleteCounter(counter: Counter): void {
+  public deleteCounter(counter: Counter): void {
     this.counterService.deleteCounter(counter.id)
     .subscribe(data => {
-      console.log(data);
       this.counters.splice(this.counters.indexOf(counter), 1);
     });
   }
 
+  public toggleCreateCounterModal(): void {
+    this.showCreateCounterModal = !this.showCreateCounterModal;
+  }
+
+  public onModalClose(form: NgForm): void {
+    form.reset();
+    this.toggleCreateCounterModal();
+  }
 
   ngOnInit() {
   }

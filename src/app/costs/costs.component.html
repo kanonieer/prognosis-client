@@ -1,21 +1,59 @@
 <section class="content">
   <h1 class="title">Koszt</h1>
   <p>Tu możesz obliczyc koszt.</p>
-  <form class="form" #costForm="ngForm" (ngSubmit)="getCost(costForm)">
+
+  <div class="tab">
+    <div class="tab-item tab-item-selected"
+    [ngClass]="{'tab-item-selected': this.showTab }"
+    (click)="toggleTab()">
+      Koszt wg. licznikach
+    </div>
+    <div class="tab-item" 
+    [ngClass]="{'tab-item-selected': !this.showTab }"
+    (click)="toggleTab()">
+      Koszt wg. grup taryfowych
+    </div>
+  </div>
+
+  <div class="tab-content" *ngIf="this.showTab">
+    <form class="form" #costForm="ngForm" (ngSubmit)="getCostForCounters(costForm)">
       <label for="month"> Miesiąc: </label>
       <select class="form-input" id="month" name="month" ngModel>
-        <option *ngFor="let month of months" [value]="month.id">{{ month?.month }}</option>
+        <option *ngFor="let month of months" [value]="month.id">
+          {{ month?.month }}
+        </option>
       </select>
-      <label for="counter">Licznik: </label>
-      <select class="form-input" id="counter" name="counter" ngModel>
-        <option *ngFor="let counter of counters" [value]="counter.id">{{ counter?.title }}</option>
-      </select>
-      <label for="tariffGroup">Grupa taryfowa: </label>
-      <select class="form-input" id="tariffGroup" name="tariffGroup" ngModel>
-        <option *ngFor="let tariffGroup of tariffGroups" [value]="tariffGroup.id">{{ tariffGroup?.title }}</option>
-      </select>
+      <fieldset class="form-fieldset" ngModelGroup="counters">
+        <legend>Wybierz liczniki: </legend>
+        <div *ngFor="let counter of counters">
+          <input type="checkbox" [attr.id]="counter.id" [name]="counter.id" [value]="counter.id" ngModel>
+          <label [attr.for]="counter.id">{{ counter?.title }}</label>
+        </div>
+      </fieldset>
       <button type="submit" class="btn form-btn">
         Policz koszt
       </button>
     </form>
+  </div>
+
+  <div class="tab-content" *ngIf="!this.showTab">
+    <form class="form" #costForm="ngForm" (ngSubmit)="getCostForTariffGroups(costForm)">
+      <label for="month"> Miesiąc: </label>
+      <select class="form-input" id="month" name="month" ngModel>
+        <option *ngFor="let month of months" [value]="month.id">
+          {{ month?.month }}
+        </option>
+      </select>
+      <fieldset class="form-fieldset" ngModelGroup="tariffGroups">
+        <legend>Wybierz grupy: </legend>
+        <div *ngFor="let tariffGroup of tariffGroups">
+          <input type="checkbox" [attr.id]="tariffGroup.id" [name]="tariffGroup.id" [value]="tariffGroup.id" ngModel>
+          <label [attr.for]="tariffGroup.id">{{ tariffGroup?.title }}</label>
+        </div>
+      </fieldset>
+      <button type="submit" class="btn form-btn">
+        Policz koszt
+      </button>
+    </form>
+  </div>
 </section>

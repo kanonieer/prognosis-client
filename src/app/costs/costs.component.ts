@@ -15,6 +15,7 @@ import { ConsumptionService } from '../services/consumption.service';
 import { Parser } from 'expr-eval';
 import { ConsumptionCost } from '../models/consumption-cost';
 import { Consumption } from '../models/consumption';
+import { ConsumptionCostService } from '../services/consumption-cost.service';
 
 @Component({
   selector: 'app-costs',
@@ -28,61 +29,145 @@ export class CostsComponent implements OnInit {
   public groupCostPerMonths: GroupCostPerMonth[] = [];
   public consumptions: Consumption[] = [];
   public consumptionCosts: ConsumptionCost[] = [];
+  public showTab: Boolean = true;
 
   constructor(
     private monthService: MonthService,
     private tariffGroupService: TariffGroupService,
     private counterService: CounterService,
     private groupCostPerMonthService: GroupCostPerMonthService,
-    private consumptionService: ConsumptionService
+    private consumptionService: ConsumptionService,
+    private consumptionCostService: ConsumptionCostService
   ) {
-    this.monthService.getMonths()
-    .subscribe(data => this.months = data);
-
-    this.tariffGroupService.getTariffGroups()
-    .subscribe(data => this.tariffGroups = data);
-
-    this.counterService.getCounters()
-    .subscribe(data => this.counters = data);
-
-    this.groupCostPerMonthService.getGroupCostPerMonths()
-    .subscribe(data => this.groupCostPerMonths = data);
-
-    this.consumptionService.getConsumptions()
-    .subscribe(data => {
-      this.consumptions = data;
-      this.consumptionCosts = _.map(this.consumptions, (item) => {
-        return _.assign(item, _.find(this.groupCostPerMonths, [ 'id', item.groupCostPerMonthId ]));
-      });
-      console.log(this.consumptions);
-      console.log(this.groupCostPerMonths);
-      console.log(this.consumptionCosts);
-    });
-
-    console.log(Parser.evaluate('2 ^ x', { x: 3 }));
+    this.fetchData();
    }
 
   ngOnInit() {
   }
 
-  public getCost(form: NgForm) {
+  private fetchData() {
+    this.monthService.getMonths()
+    .subscribe(months => this.months = months);
+
+    this.tariffGroupService.getTariffGroups()
+    .subscribe(tariffGroups => this.tariffGroups = tariffGroups);
+
+    this.counterService.getCounters()
+    .subscribe(counters => this.counters = counters);
+
+    this.groupCostPerMonthService.getGroupCostPerMonths()
+    .subscribe(groupCostPerMonths => this.groupCostPerMonths = groupCostPerMonths);
+
+    this.consumptionService.getConsumptions()
+    .subscribe(consumptions => this.consumptions = consumptions);
+
+    this.consumptionCostService.getConsumptionCost()
+    .subscribe(consumptionCosts => this.consumptionCosts = consumptionCosts);
+  }
+
+  public getCostForCounters(form: NgForm) {
     const monthId = Number(form.value.month);
-    const tariffGroupId = Number(form.value.tariffGroup);
-    const counterId = Number(form.value.counter);
+    const countersIds = form.value.counters;
+    let fullCost = 0;
+    const errors: String[] = [];
 
-    console.log(monthId, counterId);
-    const consumptionCost =
-    this.consumptionCosts.find(item => item.counterId === counterId && item.monthId === monthId);
+    Object.entries(countersIds).forEach((counter) => {
+      const [key, value] = counter;
 
-    const tariffGroup = this.tariffGroups.find(item => item.id === tariffGroupId);
+      if (value) {
+        const counterId = Number(key);
 
-    console.log(consumptionCost);
-    console.log(tariffGroup.calc);
-    const value = Parser.evaluate(tariffGroup.calc, {
-      'ZUZYCIE': consumptionCost.value,
-      'CENA': consumptionCost.cost
+        const consumptionCost =
+        this.findByCounterAndMonth(this.consumptionCosts, counterId, monthId);
+
+        if (consumptionCost) {
+          const costEvaluationSchema =
+          this.getGroupEvaluationSchema(this.tariffGroups, consumptionCost.tariffGroupId);
+
+          if (this.isSchemaSafe(costEvaluationSchema)) {
+            fullCost += this.evaluateCost(costEvaluationSchema, consumptionCost.cost, consumptionCost.value);
+          }
+        } else {
+            errors.push(this.findCounterById(counterId).title);
+        }
+
+      }
+  });
+    console.log(`Koszt ${fullCost}`);
+    console.log(errors);
+  }
+
+  public getCostForTariffGroups(form: NgForm) {
+    const monthId = Number(form.value.month);
+    const tariffGroupIds = form.value.tariffGroups;
+    console.log(tariffGroupIds);
+    let fullCost = 0;
+
+    Object.entries(tariffGroupIds).forEach((tariffGroup) => {
+      const [key, value] = tariffGroup;
+
+      if (value) {
+        const tariffGroupId = Number(key);
+
+        const consumptionCostFiltered
+        = this.findAllByTariffGroupAndMonth(this.consumptionCosts, tariffGroupId, monthId);
+
+        const evaluationSchema =
+        this.getGroupEvaluationSchema(this.tariffGroups, tariffGroupId);
+
+        if (this.isSchemaSafe(evaluationSchema)) {
+          consumptionCostFiltered.forEach(item => {
+            fullCost += this.evaluateCost(evaluationSchema, item.cost, item.value);
+          });
+        }
+      }
+      console.log(`Koszt częsciowy: ${fullCost}`);
     });
+    console.log(`Koszt całkowity: ${fullCost}`);
+  }
 
-    console.log(value);
+  private getGroupEvaluationSchema(
+    array: Array<TariffGroup>,
+    tariffGroupId: Number
+  ): String {
+    return array.find(item => item.id === tariffGroupId).calc;
+  }
+
+  private findCounterById(id: Number) {
+    return this.counters.find(item => item.id === id);
+  }
+
+  private findByCounterAndMonth(
+    array: Array<ConsumptionCost>,
+    counterId: Number,
+    monthId: Number
+  ) {
+    return array.find(item =>
+      item.counterId === counterId && item.monthId === monthId);
+  }
+
+  private findAllByTariffGroupAndMonth(
+    array: Array<ConsumptionCost>,
+    tariffGroupId: Number,
+    monthId: Number
+  ) {
+    return array.filter(item =>
+      item.tariffGroupId === tariffGroupId && item.monthId === monthId);
+  }
+
+  private evaluateCost(
+    evaluationSchema: String,
+    cost: Number,
+    consumption: Number
+  ): number {
+    return Parser.evaluate(evaluationSchema, {'CENA': cost, 'ZUZYCIE': consumption});
+  }
+
+  private isSchemaSafe(evaluationSchema): Boolean {
+    return true;
+  }
+
+  public toggleTab() {
+    this.showTab = !this.showTab;
   }
 }

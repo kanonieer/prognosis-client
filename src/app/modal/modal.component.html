@@ -1,0 +1,9 @@
+<div class="modal-container" *ngIf="show">
+  <div class="modal-content">
+    <i class="fa fa-times modal-exit" aria-hidden="true" (click)="closeModal()"></i>
+    <h2>
+        <ng-content select="[header]"></ng-content>
+    </h2>
+    <ng-content select="[content]"></ng-content>
+  </div>
+</div>

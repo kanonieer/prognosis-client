@@ -10,6 +10,8 @@ import { GroupCostPerMonth } from '../models/group-cost-per-month';
 import { CounterService } from '../services/counter.service';
 import { GroupCostPerMonthService } from '../services/group-cost-per-month.service';
 import { ConsumptionService } from '../services/consumption.service';
+import { ConsumptionCostService } from '../services/consumption-cost.service';
+import { ConsumptionCost } from '../models/consumption-cost';
 
 @Component({
   selector: 'app-consumption',
@@ -21,7 +23,7 @@ export class ConsumptionComponent implements OnInit {
   public tariffGroups: TariffGroup[] = [];
   public counters: Counter[] = [];
   public groupCostPerMonths: GroupCostPerMonth[] = [];
-  public groupCostPerMonth: GroupCostPerMonth;
+  public consumptionCosts: ConsumptionCost[] = [];
 
   constructor(
     private monthService: MonthService,
@@ -29,28 +31,36 @@ export class ConsumptionComponent implements OnInit {
     private counterService: CounterService,
     private groupCostPerMonthService: GroupCostPerMonthService,
     private consumptionService: ConsumptionService,
+    private consumptionCostService: ConsumptionCostService,
     private route: ActivatedRoute
   ) {
-    this.monthService.getMonths()
-    .subscribe(data => this.months = data);
-
-    this.tariffGroupService.getTariffGroups()
-    .subscribe(data => this.tariffGroups = data);
-
-    this.counterService.getCounters()
-    .subscribe(data => this.counters = data);
-
-    this.groupCostPerMonthService.getGroupCostPerMonths()
-    .subscribe(data => this.groupCostPerMonths = data);
+    this.fetchData();
    }
 
   ngOnInit() {}
 
+  private fetchData() {
+    this.monthService.getMonths()
+    .subscribe(months => this.months = months);
+
+    this.tariffGroupService.getTariffGroups()
+    .subscribe(tariffGroups => this.tariffGroups = tariffGroups);
+
+    this.groupCostPerMonthService.getGroupCostPerMonths()
+    .subscribe(groupCostPerMonths => this.groupCostPerMonths = groupCostPerMonths);
+
+    this.counterService.getCounters()
+    .subscribe(counters => this.counters = counters);
+
+    this.consumptionCostService.getConsumptionCost()
+    .subscribe(consumptionCosts => this.consumptionCosts = consumptionCosts);
+  }
+
   public addConsumption(form: NgForm): void {
     const monthId = Number(form.value.month);
     const tariffGroupId = Number(form.value.tariffGroup);
-    const counter = Number(form.value.counter);
-    const consumptionValue = form.value.consumptionValue;
+    const counterId = Number(form.value.counter);
+    const value = form.value.value;
     const cost = form.value.cost;
 
     console.log(form.value);
@@ -58,50 +68,57 @@ export class ConsumptionComponent implements OnInit {
       const payloadForCost = { tariffGroupId, cost, monthId };
 
       this.groupCostPerMonthService.createGroupCostPerMonth(payloadForCost)
-      .subscribe(groupCostData => {
-        console.log(groupCostData);
-        const payloadForConsumption = {
-          groupCostPerMonthId: groupCostData.id,
-          counterId: counter,
-          value: consumptionValue
-        };
+      .subscribe(newGroupCostPerMonth => {
+        console.log(newGroupCostPerMonth);
+        const groupCostPerMonthId = newGroupCostPerMonth.id;
 
-        this.consumptionService.createConsumption(payloadForConsumption)
-        .subscribe(data => console.log(data));
+        this.registerConsumption(groupCostPerMonthId, counterId, value);
       });
     } else {
-      const payloadForConsumption = {
-        groupCostPerMonthId: this.groupCostPerMonth.id,
-        counterId: counter,
-        value: consumptionValue
-      };
+      const groupCostPerMonthId = this.getGroupCostPerMonthId(monthId, tariffGroupId);
 
-      this.consumptionService.createConsumption(payloadForConsumption)
-      .subscribe(data => console.log(data));
+      this.registerConsumption(groupCostPerMonthId, counterId, value);
     }
 
     form.reset();
   }
 
-  public hasGroupCostPerMonth(monthId, tariffGroupId) {
-    if (monthId !== '' && tariffGroupId !== '') {
-      return !!!this.getGroupCostPerMonth(monthId, tariffGroupId);
-    } else {
-      return false;
+  public hasGroupAssignedCost(monthId, tariffGroupId): Boolean {
+    if (this.valuesAreSelected(monthId, tariffGroupId)) {
+      console.log(`Month ${monthId}, tariffGroup ${tariffGroupId}`);
+      return !!this.groupCostPerMonths.find(item =>
+        item.monthId.toString() === monthId && item.tariffGroupId.toString() === tariffGroupId);
     }
+
+    return true;
   }
 
-  private getGroupCostPerMonth(monthId, tariffGroupId): GroupCostPerMonth | any {
-    const filteredGroups = this.groupCostPerMonths.filter(groupCostPerMonth => {
-      return (groupCostPerMonth.monthId.toString() === monthId)
-      && (groupCostPerMonth.tariffGroupId.toString() === tariffGroupId);
-    });
-
-    if (filteredGroups.length) {
-      this.groupCostPerMonth = filteredGroups[0];
-      return filteredGroups[0];
-    } else {
-      return false;
+  public hasAssignedGroupInMonth(monthId, counterId): Boolean {
+    if (this.valuesAreSelected(monthId, counterId)) {
+      return !!this.consumptionCosts.find(item =>
+        item.monthId.toString() === monthId && item.counterId.toString() === counterId);
     }
+
+    return true;
+  }
+
+  public valuesAreSelected(value1, value2): Boolean {
+    return value1 !== '' && value1 !== undefined && value1 !== null
+    && value2 !== '' && value2 !== undefined && value2 !== null;
+  }
+
+  private getGroupCostPerMonthId(monthId, tariffGroupId) {
+    return this.groupCostPerMonths.find(item =>
+      item.monthId === monthId && item.tariffGroupId === tariffGroupId);
+
+  }
+
+  private registerConsumption(groupCostPerMonthId, counterId, value) {
+    const payloadForConsumption = { groupCostPerMonthId, counterId, value };
+
+    this.consumptionService.createConsumption(payloadForConsumption)
+    .subscribe(data => console.log(data));
+
+    this.fetchData();
   }
 }

@@ -1,10 +1,30 @@
 <section class="content">
     <h1 class="title">Liczniki</h1>
-    <button class="btn" (click)="createCounter()">Dodaj licznik</button>
+    <button class="btn" (click)="toggleCreateCounterModal()">Dodaj licznik</button>
     <p>Lista licznikow:</p>
     <p *ngFor="let counter of counters">
         {{ counter?.title }}
         <i class="fa fa-minus-square-o" aria-hidden="true" (click)="deleteCounter(counter)"></i>
     </p>
 </section>
-
+<app-modal [show]="this.showCreateCounterModal" (hide)="onModalClose(createCounterForm)">
+    <h2 header>Nowy Licznik</h2>
+    <form class="form" #createCounterForm="ngForm" (ngSubmit)="createCounter(createCounterForm)" content>
+        <label for="counter">Nazwa licznika</label>
+        <input class="form-input"
+        type="text"
+        id="counter"
+        name="counter"
+        [(ngModel)]="counter"
+        required>
+        <div *ngIf="!createCounterForm.form.controls.counter?.valid 
+        && (createCounterForm.form.controls.counter?.dirty
+        || createCounterForm.form.controls.counter?.touched)"
+        class="form-invalid">
+        Nazwa jest wymagana!
+        </div>
+        <button type="submit" [disabled]="!createCounterForm.form.valid" class="btn form-btn">
+            Zapisz
+        </button>
+    </form>
+</app-modal>
