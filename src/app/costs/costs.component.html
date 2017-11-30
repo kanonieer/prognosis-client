@@ -71,9 +71,9 @@
     </p>
     <div *ngIf="!!costSummary.errors.length" class="cost-invalid">
       Poniższe liczniki nie zostały uwzględnione w rachunku ponieważ 
-      nie przypisano im grupy taryfowej w wybranym miesiącu
+      nie przypisano im grupy taryfowej w wybranym miesiącu:
       <p *ngFor="let item of costSummary?.errors">
-        {{ item }}
+        - {{ item }}
       </p>
     </div>
   </div>
@@ -91,7 +91,7 @@
     <div *ngIf="!!costSummary.errors.length" class="cost-invalid">
       Poniższe grupy taryfowe mają niepoprawny schemat liczenia kosztu:
       <p *ngFor="let item of costSummary?.errors">
-        {{ item }}
+        - {{ item }}
       </p>
     </div>
   </div>

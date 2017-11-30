@@ -1,7 +1,7 @@
 <section class="content">
     <h1 class="title">Liczniki</h1>
     <button class="btn" (click)="toggleCreateCounterModal()">Dodaj licznik</button>
-    <p>Lista licznikow:</p>
+    <p>Lista liczników:</p>
     <p *ngFor="let counter of counters">
         {{ counter?.title }}
         <i class="fa fa-minus-square-o" aria-hidden="true" (click)="deleteCounter(counter)"></i>
